@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/categories.css') }}">
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="flex flex-col min-h-screen bg-gray-100">
     @include('layouts.header')

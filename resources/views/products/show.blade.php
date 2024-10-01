@@ -45,7 +45,7 @@
                 
                 <!-- Size Selection -->
                 <div class="mt-4">
-                    <h3 class="text-lg font-semibold mb-2">Pilih Ukuran:</h3>
+                    <h3 class="text-lg font-semibold mb-2">Select size:</h3>
                     <div class="flex flex-wrap gap-2">
                         @foreach (['S', 'M', 'L', 'XL', 'XXL'] as $size)
                             <button class="size-button px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500">
@@ -55,7 +55,23 @@
                     </div>
                 </div>
                 
-                <button class="mt-6 bg-yellow-500 text-white px-6 py-2 rounded hover:bg-yellow-600 w-full">Beli Sekarang</button>
+                @php
+                    $inWishlist = Auth::check() && Auth::user()->wishlists()->where('product_id', $product->id)->exists();
+                    $inCart = Auth::check() && Auth::user()->carts()->where('product_id', $product->id)->exists();
+                @endphp
+
+                <!-- Add to Wishlist and Add to Cart buttons -->
+                 
+                <div class="mt-6 flex space-x-2">
+                    <button id="toggleWishlist" class="p-2 {{ $inWishlist ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-gray-200 text-gray-600 hover:bg-gray-300' }} transition">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <button id="toggleCart" class="flex-1 {{ $inCart ? 'bg-gray-800 hover:bg-gray-900' : 'bg-black hover:bg-gray-800' }} text-white px-4 py-2 rounded transition">
+                        <i class="fas fa-shopping-cart mr-2"></i> <span id="cartButtonText">{{ $inCart ? 'Added to Cart' : 'Add to Cart' }}</span>
+                    </button>
+                </div>
+                
+                <button id="buyNow" class="mt-4 bg-yellow-500 text-white px-6 py-2 rounded hover:bg-yellow-600 w-full">Buy Now</button>
             </div>
         </div>
     </div>
@@ -100,6 +116,84 @@ document.addEventListener('DOMContentLoaded', function() {
             sizeButtons.forEach(btn => btn.classList.remove('bg-yellow-500', 'text-white'));
             this.classList.add('bg-yellow-500', 'text-white');
         });
+    });
+
+    const toggleWishlistBtn = document.getElementById('toggleWishlist');
+    const toggleCartBtn = document.getElementById('toggleCart');
+    const cartButtonText = document.getElementById('cartButtonText');
+    const buyNowBtn = document.getElementById('buyNow');
+
+    let inWishlist = {{ $inWishlist ? 'true' : 'false' }};
+    let inCart = {{ $inCart ? 'true' : 'false' }};
+
+    function toggleWishlist() {
+        const url = inWishlist ? '/wishlist/remove' : '/wishlist/add';
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ product_id: {{ $product->id }} })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                inWishlist = !inWishlist;
+                if (inWishlist) {
+                    toggleWishlistBtn.classList.remove('bg-gray-200', 'text-gray-600', 'hover:bg-gray-300');
+                    toggleWishlistBtn.classList.add('bg-red-500', 'text-white', 'hover:bg-red-600');
+                } else {
+                    toggleWishlistBtn.classList.remove('bg-red-500', 'text-white', 'hover:bg-red-600');
+                    toggleWishlistBtn.classList.add('bg-gray-200', 'text-gray-600', 'hover:bg-gray-300');
+                }
+            }
+            // You can use a more subtle notification instead of alert
+            console.log(data.message);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function toggleCart() {
+        const url = inCart ? '/cart/remove' : '/cart/add';
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ 
+                product_id: {{ $product->id }},
+                quantity: 1
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                inCart = !inCart;
+                if (inCart) {
+                    toggleCartBtn.classList.remove('bg-black', 'hover:bg-gray-800');
+                    toggleCartBtn.classList.add('bg-gray-800', 'hover:bg-gray-900');
+                    cartButtonText.textContent = 'Added to Cart';
+                } else {
+                    toggleCartBtn.classList.remove('bg-gray-800', 'hover:bg-gray-900');
+                    toggleCartBtn.classList.add('bg-black', 'hover:bg-gray-800');
+                    cartButtonText.textContent = 'Add to Cart';
+                }
+            }
+            // You can use a more subtle notification instead of alert
+            console.log(data.message);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    toggleWishlistBtn.addEventListener('click', toggleWishlist);
+    toggleCartBtn.addEventListener('click', toggleCart);
+
+    buyNowBtn.addEventListener('click', function() {
+        // Implementasi logika untuk pembelian langsung
+        // Misalnya, redirect ke halaman checkout
+        window.location.href = '/checkout';
     });
 });
 </script>

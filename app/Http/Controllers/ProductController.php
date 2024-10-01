@@ -31,18 +31,36 @@ class ProductController extends Controller
 
     public function categories()
     {
-        $categories = [
-            'Dresses', 'Tops', 'Bottoms', 'Outerwear', 'Accessories'
-        ];
-
+        $tags = Tag::all();
         $newProducts = Product::latest()->take(9)->get();
 
-        return view('products.categories', compact('categories', 'newProducts'));
+        return view('products.categories', compact('tags', 'newProducts'));
     }
 
     public function allProducts()
     {
         $products = Product::with('tags')->get();
+        return response()->json($products);
+    }
+
+    public function home()
+    {
+        $featuredProducts = Product::with('tags')->featured()->take(6)->get();
+        return view('home', compact('featuredProducts'));
+    }
+
+    public function getProductsByTag(Request $request)
+    {
+        $tag = $request->query('tag');
+        
+        if ($tag === 'new') {
+            $products = Product::latest()->take(9)->get();
+        } else {
+            $products = Product::whereHas('tags', function ($query) use ($tag) {
+                $query->where('name', $tag);
+            })->get();
+        }
+
         return response()->json($products);
     }
 }

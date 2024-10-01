@@ -34,6 +34,20 @@
     .category-link.active::before {
         transform: scaleX(1);
     }
+    .product-image-container {
+        position: relative;
+        overflow: hidden;
+    }
+    .product-image-2 {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .product-image-container:hover .product-image-2 {
+        opacity: 1;
+    }
 </style>
 
 <div class="container mx-auto px-4 py-8 flex">
@@ -44,13 +58,13 @@
             <ul class="space-y-2">
                 <li>
                     <a href="#" class="category-link active block py-2 px-4 rounded transition duration-300 ease-in-out" data-category="new">
-                        New
+                        Baru
                     </a>
                 </li>
-                @foreach ($categories as $category)
+                @foreach ($tags as $tag)
                 <li>
-                    <a href="#" class="category-link block py-2 px-4 rounded transition duration-300 ease-in-out" data-category="{{ strtolower($category) }}">
-                        {{ $category }}
+                    <a href="#" class="category-link block py-2 px-4 rounded transition duration-300 ease-in-out" data-category="{{ strtolower($tag->name) }}">
+                        {{ $tag->name }}
                     </a>
                 </li>
                 @endforeach
@@ -60,17 +74,20 @@
 
     <!-- Main content on the right -->
     <div class="w-3/4">
-        <h1 class="text-3xl font-bold mb-8" id="category-title">New Arrivals</h1>
+        <h1 class="text-3xl font-bold mb-8" id="category-title">NEW</h1>
 
         <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach ($newProducts as $product)
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                <div class="aspect-w-1 aspect-h-1 w-full">
-                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                <div class="aspect-w-1 aspect-h-1 w-full product-image-container">
+                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover product-image-1">
+                    @if($product->image2)
+                        <img src="{{ asset('storage/' . $product->image2) }}" alt="{{ $product->name }}" class="w-full h-full object-cover product-image-2">
+                    @endif
                 </div>
-                <div class="p-4">
+                <div class="text-center p-4">
                     <h3 class="text-lg font-semibold mb-2">{{ $product->name }}</h3>
-                    <p class="text-gray-600">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                    <p class="text-green-700 font-bold">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
                 </div>
             </div>
             @endforeach
@@ -94,13 +111,14 @@
                 categoryTitle.textContent = this.textContent.trim();
                 
                 // Fetch products for the selected category
-                fetch(`/api/products?category=${category}`)
+                fetch(`/api/products?tag=${category}`)
                     .then(response => response.json())
                     .then(products => {
                         productGrid.innerHTML = products.map(product => `
                             <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                                <div class="aspect-w-1 aspect-h-1 w-full">
-                                    <img src="${product.image ? '/storage/' + product.image : '/path/to/placeholder-image.jpg'}" alt="${product.name}" class="w-full h-full object-cover">
+                                <div class="aspect-w-1 aspect-h-1 w-full product-image-container">
+                                    <img src="${product.image ? '/storage/' + product.image : '/path/to/placeholder-image.jpg'}" alt="${product.name}" class="w-full h-full object-cover product-image-1">
+                                    ${product.image2 ? `<img src="/storage/${product.image2}" alt="${product.name}" class="w-full h-full object-cover product-image-2">` : ''}
                                 </div>
                                 <div class="p-4">
                                     <h3 class="text-lg font-semibold mb-2">${product.name}</h3>

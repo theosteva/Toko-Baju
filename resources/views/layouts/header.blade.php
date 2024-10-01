@@ -22,6 +22,16 @@
             </a>
         </div>
 
+        <!-- Wishlist dan Cart (kanan) -->
+        <div class="flex items-center space-x-4">
+            <a href="{{ route('wishlist.index') }}" id="wishlist-button" class="bg-white text-black px-4 py-2 rounded-full shadow-lg hover:bg-gray-200 transition">
+                <i class="far fa-heart mr-2"></i> Wishlist
+            </a>
+            <a href="{{ route('cart.index') }}" id="cart-button" class="bg-white text-black px-4 py-2 rounded-full shadow-lg hover:bg-gray-200 transition">
+                <i class="fas fa-shopping-cart mr-2"></i> Keranjang
+            </a>
+        </div>
+
         <!-- Mobile menu button -->
         <button id="menu-toggle" class="md:hidden text-2xl text-white">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -67,4 +77,30 @@
     document.getElementById('menu-toggle').addEventListener('click', function() {
         document.getElementById('mobile-menu').classList.toggle('hidden');
     });
+
+    // Fungsi untuk menambahkan produk ke Wishlist
+    function addToWishlist(productId) {
+        fetch('/wishlist/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ product_id: productId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Produk ditambahkan ke Wishlist:', data);
+            // Update UI sesuai kebutuhan
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Event listener untuk tombol Wishlist
+    document.getElementById('wishlist-button').addEventListener('click', function() {
+        // Anda dapat menampilkan modal atau halaman Wishlist di sini
+        console.log('Tombol Wishlist diklik');
+    });
+
+    // Fungsi dan event listener untuk Keranjang dapat ditambahkan di sini juga
 </script>
