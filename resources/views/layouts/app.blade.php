@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="{{ asset('css/categories.css') }}">
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 </head>
 <body class="flex flex-col min-h-screen bg-gray-100">
     @include('layouts.header')
@@ -20,5 +22,16 @@
     </main>
 
     @include('layouts.footer')
+
+    <script>
+        @if(session('success'))
+            Swal.fire({
+                title: 'Sukses!',
+                text: "{{ session('success') }}",
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+        @endif
+    </script>
 </body>
 </html>

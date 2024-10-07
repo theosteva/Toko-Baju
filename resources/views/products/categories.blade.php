@@ -58,7 +58,7 @@
             <ul class="space-y-2">
                 <li>
                     <a href="#" class="category-link active block py-2 px-4 rounded transition duration-300 ease-in-out" data-category="new">
-                        Baru
+                        New
                     </a>
                 </li>
                 @foreach ($tags as $tag)
@@ -78,18 +78,20 @@
 
         <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach ($newProducts as $product)
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                <div class="aspect-w-1 aspect-h-1 w-full product-image-container">
-                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover product-image-1">
-                    @if($product->image2)
-                        <img src="{{ asset('storage/' . $product->image2) }}" alt="{{ $product->name }}" class="w-full h-full object-cover product-image-2">
-                    @endif
+            <a href="{{ route('products.show', $product->id) }}" class="block"> <!-- Tambahkan link di sini -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <div class="aspect-w-1 aspect-h-1 w-full product-image-container">
+                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover product-image-1">
+                        @if($product->image2)
+                            <img src="{{ asset('storage/' . $product->image2) }}" alt="{{ $product->name }}" class="w-full h-full object-cover product-image-2">
+                        @endif
+                    </div>
+                    <div class="text-center p-4">
+                        <h3 class="text-lg font-semibold mb-2">{{ $product->name }}</h3>
+                        <p class="text-green-700 font-bold">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                    </div>
                 </div>
-                <div class="text-center p-4">
-                    <h3 class="text-lg font-semibold mb-2">{{ $product->name }}</h3>
-                    <p class="text-green-700 font-bold">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
-                </div>
-            </div>
+            </a>
             @endforeach
         </div>
     </div>
